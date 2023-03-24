@@ -51,11 +51,14 @@
         .then(data => {
           console.log(data); // Display the response data
           const { id } = data.user; // Extract the user ID
-          window.location.href = `http://127.0.0.1:5000/success/${id}`; // Redirect to success page
+          const successMessage = document.createElement('p');
+          successMessage.textContent = 'User created successfully';
+          document.body.appendChild(successMessage);
+          setTimeout(() => {
+            window.location.href = `login.html`; // Redirect to login page
+          }, 2000); // Delay for 5 seconds
         })
         .catch(error => console.error(error));
-
-
     });
 
   </script>

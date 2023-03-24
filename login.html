@@ -22,16 +22,16 @@
                 <div class="login-content">
                     <!--username input-->
                     <div class="username">
-                        <label for="username"><img src="assets/User_icos_acm-login.png" alt="" width="25px" height="25px" class="user-icon"></label>
-                        <input type="text" placeholder="Username">
+                        <label for="username" ><img src="assets/User_icos_acm-login.png" alt="" width="25px" height="25px" class="user-icon"></label>
+                        <input type="text" id = "username" placeholder="Username">
                     </div>
                     <!--password input-->
                     <div class="pwd">
                         <label for="psw"><img src="assets/User_and_Pass_Login_Page_Pics_Lock_Transpar.png" alt="" width="25px" height="25px" class="lock-icon"></label>   
-                        <input type="text" placeholder="Password">
+                        <input type="text" id = "password" placeholder="Password">
                     </div>
                     <!--Link to the Sign up page if user does not have an account-->
-                    <p class="no-acc">Don't Have an Accout? <a href="#signup"> Sign Up</a></p>
+                    <p class="no-acc">Don't Have an Accout? <a href="signup.html"> Sign Up</a></p>
                     <!--
                         This div suronds the Login button so that we can center it using flex
                         box in css
@@ -39,14 +39,47 @@
                     <div class="login-btn-cont">
                         <div>
                             <!--Login Button-->
-                            <button>Login</button>
+                            <button type="button" id = "login-button">Login</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    
 
+    <script>
+        const loginButton = document.getElementById("login-button");
+        loginButton.addEventListener("click", function (event) {
+          event.preventDefault(); // Prevent form submission
+    
+          const username = document.getElementById("username").value;
+          //const email = document.getElementById("email").value; //only for needed for signup page
+          const password = document.getElementById("password").value;
+    
+          fetch('http://127.0.0.1:5000/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to login user');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data); // Display the response data
+              const { id } = data.user; // Extract the user ID
+              window.location.href = `http://127.0.0.1:5000/login/${id}`; // Redirect to success page
+            })
+            .catch(error => console.error(error));
+    
+    
+        });
+
+    </script>
 </body>
+
 </html>

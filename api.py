@@ -4,6 +4,7 @@ from flask import Flask, abort, request, jsonify, g, url_for, redirect, render_t
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 import jwt
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -31,10 +32,18 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def generate_auth_token(self, expires_in=600):
-        return jwt.encode(
-            {'id': self.id, 'exp': time.time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256')
+    def generate_auth_token(self):
+        payload = {
+            'sub': self.id,
+            'exp': datetime.utcnow() + timedelta(days=1)
+        }
+        token = jwt.encode(
+            payload, app.config['SECRET_KEY'], algorithm='HS256')
+        return token
+    
+
+
+    
 
     @staticmethod
     def verify_auth_token(token):
@@ -45,6 +54,7 @@ class User(db.Model):
             return
         return User.query.get(data['id'])
 db.create_all()
+
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -77,7 +87,20 @@ def new_user():
     return jsonify({'message': 'User created successfully', 'user': {'username': user.username, 'email': user.email, 'id': user.id}}), 201
 
 
-    #return redirect(url_for('success', id=user.id))
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username is None or password is None:
+        abort(400)    # missing arguments
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.verify_password(password):
+        abort(401)  # access denied password
+    token = user.generate_auth_token()
+
+    return jsonify({'message': 'Known user, now logged in', 'user': {'username': user.username, 'email': user.email, 'id': user.id}, 'token': token}), 201
+
+    # return redirect(url_for('success', id=user.id))
 
 
 @app.route('/success/<int:id>')
@@ -96,10 +119,7 @@ def get_user(id):
     return jsonify({'username': user.username})
 
 
-
-
 if __name__ == '__main__':
     if not os.path.exists('db.sqlite'):
         db.create_all()
     app.run(debug=True)
-
