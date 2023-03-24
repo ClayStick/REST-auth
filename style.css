@@ -1,0 +1,119 @@
+/*Display grid was used to center the form in the center of the screen*/
+body{
+    /*This is for the grey-striped backgound*/
+
+    background-image: linear-gradient(to left, #e2c049 5%, #747474 5%, #747474 5%, #747474 15%,#e2c049 15%, #e2c049 15%, #e2c049 16%,#747474 16%, #747474 16%, #747474, 17.5%,#e2c049 17.5%);
+    display: grid;
+    height: 100vh;
+    place-items: center;
+}
+
+
+form{
+    display: flex;
+    flex-direction: column;
+}
+
+.container{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+div.top{
+    height: 100px;
+    width: 100%;
+}
+
+div.bottom{
+    height: 100px;
+    width: 100%;
+
+}
+
+
+
+/* child of the container */
+.login-container{
+    border: solid black 1px;
+    border-radius: 10px;
+    background-color: #DBDBDB;
+    height: 100%;
+    width: 500px;
+    padding: 5%;
+    display: flex;
+    justify-content: center;
+    box-shadow: rgb(59, 59, 59) 2px 2px 5px;
+}
+
+.login-content{
+    width: 100%;
+    
+}
+
+.username{
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    height: 30px;
+}
+
+.pwd{
+    display: flex;
+    justify-content: center;
+    height: 30px
+}
+
+input{
+    background-color: #C4C4C4;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-size: large;
+}
+
+
+p.no-acc{
+    margin: none;
+    padding-top: none;
+    margin-bottom: 25px;
+    font-size: small;
+    display: flex;
+    justify-content: center;
+    color: #5A5A5A;
+    gap: 8px;
+}
+
+div.login-btn-cont{
+    display: flex;
+    justify-content: center;
+}
+
+button{
+    padding: 8px;
+    padding-left: 30px;
+    padding-right:30px;
+    border: #C4C4C4;
+    border-radius: 10px;
+}
+
+button:hover{
+    padding: 8px;
+    padding-left: 30px;
+    padding-right:30px;
+    border: #C4C4C4;
+    border-radius: 10px;
+    background-color: #e2c049;
+}
+
+label{
+    background-color: #EAEAEA ;
+    padding: 10px;
+    color: #747474;
+    display: flex;
+    align-items: center;
+}
+
+a{
+    color: black;
+}

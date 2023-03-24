@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Complete</title>
+</head>
+<body>
+  <h1>Registration Complete</h1>
+  <p>Thank you for registering!</p>
+  <h2>Registered User Information:</h2>
+
+  <h1>New user created!</h1>
+  <p>Username: {{ user.username }}</p>
+  <p>Email: {{ user.email }}</p>
+  <ul>
+    <li><strong>Name:</strong> <span id="name"></span></li>
+    <li><strong>Email:</strong> <span id="email"></span></li>
+  </ul>
+
+  <script>
+    // Retrieve the registered user data from the URL query string
+    const searchParams = new URLSearchParams(window.location.search);
+    const name = searchParams.get('name');
+    const email = searchParams.get('email');
+
+    // Display the registered user data on the page
+    document.getElementById('name').textContent = name;
+    document.getElementById('email').textContent = email;
+  </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
 import os
 import time
-from flask import Flask, abort, request, jsonify, g, url_for
+from flask import Flask, abort, request, jsonify, g, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # initialization
 app = Flask(__name__)
@@ -21,7 +21,8 @@ auth = HTTPBasicAuth()
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(32), index=True)
+    username = db.Column(db.String(32), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
     def hash_password(self, password):
@@ -43,7 +44,7 @@ class User(db.Model):
         except:
             return
         return User.query.get(data['id'])
-
+db.create_all()
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -61,17 +62,30 @@ def verify_password(username_or_token, password):
 @app.route('/api/users', methods=['POST'])
 def new_user():
     username = request.json.get('username')
+    email = request.json.get('email')
     password = request.json.get('password')
-    if username is None or password is None:
+    if username is None or email is None or password is None:
         abort(400)    # missing arguments
     if User.query.filter_by(username=username).first() is not None:
-        abort(400)    # existing user
-    user = User(username=username)
+        abort(400)    # existing username
+    if User.query.filter_by(email=email).first() is not None:
+        abort(400)    # existing email
+    user = User(username=username, email=email)
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    return (jsonify({'username': user.username}), 201,
-            {'Location': url_for('get_user', id=user.id, _external=True)})
+    return jsonify({'message': 'User created successfully', 'user': {'username': user.username, 'email': user.email, 'id': user.id}}), 201
+
+
+    #return redirect(url_for('success', id=user.id))
+
+
+@app.route('/success/<int:id>')
+def success(id):
+    user = User.query.get(id)
+    if not user:
+        abort(400)
+    return f"New user created with username {user.username}, email {user.email}, and id {user.id}!"
 
 
 @app.route('/api/users/<int:id>')
@@ -82,20 +96,10 @@ def get_user(id):
     return jsonify({'username': user.username})
 
 
-@app.route('/api/token')
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token(600)
-    return jsonify({'token': token.decode('ascii'), 'duration': 600})
-
-
-@app.route('/api/resource')
-@auth.login_required
-def get_resource():
-    return jsonify({'data': 'Hello, %s!' % g.user.username})
 
 
 if __name__ == '__main__':
     if not os.path.exists('db.sqlite'):
         db.create_all()
     app.run(debug=True)
+
